@@ -1,0 +1,280 @@
+:root {
+  --sap-bg: #f4f5f7;
+  --sap-surface: #ffffff;
+  --sap-text: #1f2430;
+  --sap-muted: #6b7280;
+  --sap-border: #e2e4e9;
+  --sap-primary: #3366ff;
+  --sap-radius: 10px;
+  --sap-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
+  --sap-shadow-hover: 0 10px 24px rgb(0 0 0 / 0.14);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--sap-bg);
+  color: var(--sap-text);
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+// Consistent, elegant focus ring for every native form control across the app, instead of
+// each page defining its own (or relying on the browser's inconsistent default outline).
+input,
+select,
+textarea {
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--sap-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--sap-primary) 18%, transparent);
+  }
+}
+
+// Shared animate.enter/animate.leave classes (Angular's native enter/leave animation
+// primitive — the element gets this class only while entering/leaving the DOM, removed
+// once the animation finishes). Defined globally so every page reuses the same, consistent
+// motion instead of each component redefining its own keyframes.
+@keyframes sap-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sap-fade-out-down {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.fade-in-up {
+  // backwards: holds the "from" (opacity: 0) state through any animation-delay too, not just
+  // during the animation itself — otherwise a delayed item (e.g. a staggered list) would
+  // flash at full visibility until its delay elapses, then jump to invisible and fade in.
+  animation: sap-fade-in-up 0.25s ease-out backwards;
+}
+
+// Plain fade, no slide — for small inline elements (badges, icons) where an 8px vertical
+// shift would look oversized relative to the element itself.
+@keyframes sap-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sap-fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.fade-in {
+  animation: sap-fade-in 0.2s ease-out backwards;
+}
+
+.fade-out {
+  animation: sap-fade-out 0.15s ease-in;
+}
+
+.fade-out-down {
+  animation: sap-fade-out-down 0.2s ease-in;
+}
+
+// Route-change animation, via the native browser View Transitions API (see
+// `withViewTransitions()` in app.config.ts) — a plain cross-fade, overriding the browser's
+// default (which also includes a slight cross-scale that reads oddly for a full-page swap).
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.22s;
+  animation-timing-function: ease;
+}
+
+::view-transition-old(root) {
+  animation-name: sap-page-out;
+}
+
+::view-transition-new(root) {
+  animation-name: sap-page-in;
+}
+
+@keyframes sap-page-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes sap-page-in {
+  from {
+    opacity: 0;
+  }
+}
+
+// Respect the OS-level "reduce motion" preference across every animation/transition in the
+// app at once. Near-zero duration rather than `animation: none` — `animate.leave`'s element
+// removal waits for an animation to actually finish, so a true no-animation would never fire
+// that completion and the element would be stuck in the DOM forever.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+// Syntax-highlight token colors (currently used by JSON Formatter's [innerHTML]-rendered
+// backdrop — see highlightJson() in json-formatter.ts). Global rather than component-scoped on
+// purpose: elements injected via [innerHTML] at runtime bypass Angular's template compiler
+// entirely, so they never receive its view-encapsulation attribute, and a scoped rule in the
+// component's own stylesheet would silently never match them (confirmed by this being broken
+// before it moved here — every token rendered in the default text color, not its "own" one).
+// VS Code's default Light+ theme palette, since these panes sit on a light surface, not dark.
+.tok-key {
+  color: #0451a5;
+}
+
+.tok-string {
+  color: #a31515;
+}
+
+.tok-number {
+  color: #098658;
+}
+
+.tok-keyword {
+  color: #0000ff;
+}
+
+.tok-punctuation {
+  color: var(--sap-text);
+}
+
+// XML Formatter's own syntax-highlight token colors (see highlightXml() in xml-formatter.ts) —
+// global for the same [innerHTML]-encapsulation reason as the .tok-* rules above. A classic
+// XML color scheme (maroon tags/punctuation, red attribute names, blue attribute values, green
+// comments) rather than reusing .tok-*: XML's token kinds (tag name vs. attribute vs. text)
+// don't correspond to JSON's (key vs. string vs. number), so sharing class names would only
+// coincide by accident rather than mean the same thing.
+.xml-tagname,
+.xml-punct {
+  color: #800000;
+}
+
+.xml-attrname {
+  color: #ff0000;
+}
+
+.xml-attrvalue {
+  color: #0000ff;
+}
+
+.xml-comment {
+  color: #008000;
+}
+
+.xml-cdata,
+.xml-decl {
+  color: #808080;
+}
+
+.xml-text {
+  color: var(--sap-text);
+}
+
+// CSS syntax-highlight token colors (see highlightCss() in loading-indicator.ts, used for the
+// generated-CSS output box) — global for the same [innerHTML]-encapsulation reason as the
+// .tok-*/.xml-* rules above. A classic scheme distinct from both: at-rules in purple, selectors
+// in maroon (reusing XML's "the thing being targeted" color, since a CSS selector plays the same
+// role a tag name does), property names in red, function names in brown, strings/numbers reusing
+// JSON's own shades for the same kind of literal value.
+.css-comment {
+  color: #008000;
+}
+
+.css-at-rule {
+  color: #af00db;
+}
+
+.css-selector {
+  color: #800000;
+}
+
+.css-property {
+  color: #ff0000;
+}
+
+.css-function {
+  color: #795e26;
+}
+
+.css-string {
+  color: #a31515;
+}
+
+.css-number {
+  color: #098658;
+}
+
+.css-value,
+.css-punct {
+  color: var(--sap-text);
+}
+
+// Suppresses each tool's own self-rendered <sap-page-header> specifically when that tool is
+// being rendered inside a dashboard widget card (which already has its own compact icon/title
+// header) — global rather than scoped in dashboard.scss on purpose: a widget's body is filled
+// dynamically via NgComponentOutlet, and Angular's view encapsulation means a parent component's
+// SCOPED styles can't reach into a dynamically-mounted child's own template (same boundary as
+// the documented `ftd-button`/`display:contents` gotcha elsewhere in this app) — only an
+// unscoped, global rule carries no such attribute-matching restriction.
+.widget-body sap-page-header {
+  display: none;
+}

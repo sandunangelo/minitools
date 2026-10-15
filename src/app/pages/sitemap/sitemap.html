@@ -1,0 +1,42 @@
+<sap-page-header icon="🗺️" title="Sitemap" description="Every page in Minitools, at a glance." />
+
+<ul class="tree" role="tree">
+  @for (page of pages; track page.id) {
+    <li class="tree-node" role="treeitem" [attr.aria-expanded]="page.children ? isExpanded(page.id) : null">
+      <div class="tree-row">
+        @if (page.children) {
+          <button
+            type="button"
+            class="tree-toggle"
+            [class.expanded]="isExpanded(page.id)"
+            (click)="toggle(page.id)"
+            [attr.aria-expanded]="isExpanded(page.id)"
+            [attr.aria-label]="(isExpanded(page.id) ? 'Collapse' : 'Expand') + ' ' + page.title"
+          >▾</button>
+        } @else {
+          <span class="tree-toggle-spacer" aria-hidden="true"></span>
+        }
+        <a class="tree-link" [routerLink]="page.route">
+          <span class="tree-icon" aria-hidden="true">{{ page.icon }}</span>
+          <span class="tree-label">{{ page.title }}</span>
+        </a>
+        <span class="tree-description">{{ page.description }}</span>
+      </div>
+
+      @if (page.children && isExpanded(page.id)) {
+        <ul class="tree-children" role="group">
+          @for (child of page.children; track child.id) {
+            <li class="tree-node" role="treeitem">
+              <div class="tree-row">
+                <a class="tree-link" [routerLink]="page.route" [queryParams]="child.queryParams">
+                  <span class="tree-icon" aria-hidden="true">{{ child.icon }}</span>
+                  <span class="tree-label">{{ child.label }}</span>
+                </a>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </li>
+  }
+</ul>

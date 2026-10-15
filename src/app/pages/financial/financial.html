@@ -1,0 +1,33 @@
+<sap-page-header
+  icon="🏦"
+  title="Financial"
+  description="Currency tools — live exchange rates, and amount-in-words for cheques and bank slips."
+/>
+
+<div class="subtool-tabs">
+  <button
+    type="button"
+    class="tab"
+    [class.active]="activeSubtool() === 'exchange-rates'"
+    (click)="activeSubtool.set('exchange-rates')"
+  >
+    💱 Exchange Rates
+  </button>
+  <button
+    type="button"
+    class="tab"
+    [class.active]="activeSubtool() === 'amount-in-words'"
+    (click)="activeSubtool.set('amount-in-words')"
+  >
+    🔤 Amount in Words
+  </button>
+</div>
+
+@switch (activeSubtool()) {
+  @case ('exchange-rates') {
+    <sap-exchange-rates />
+  }
+  @case ('amount-in-words') {
+    <sap-amount-in-words />
+  }
+}

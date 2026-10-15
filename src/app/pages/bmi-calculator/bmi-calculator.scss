@@ -1,0 +1,60 @@
+.bmi-form {
+  display: flex;
+  align-items: end;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--sap-muted);
+
+  input {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--sap-border);
+    border-radius: 6px;
+    background: var(--sap-surface);
+    color: var(--sap-text);
+    font-size: 1rem;
+    min-width: 140px;
+  }
+}
+
+.result-panel {
+  padding: 1.25rem 1.5rem;
+  background: var(--sap-surface);
+  border: 1px solid var(--sap-border);
+  border-left: 6px solid var(--sap-muted);
+  border-radius: var(--sap-radius);
+  box-shadow: var(--sap-shadow);
+
+  &.under {
+    border-left-color: #3b82f6;
+  }
+
+  &.normal {
+    border-left-color: #22c55e;
+  }
+
+  &.over {
+    border-left-color: #f59e0b;
+  }
+
+  &.obese {
+    border-left-color: #ef4444;
+  }
+}
+
+.bmi-value {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.bmi-category {
+  margin-top: 0.25rem;
+  color: var(--sap-muted);
+}

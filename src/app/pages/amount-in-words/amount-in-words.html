@@ -1,0 +1,67 @@
+<section class="converter-section">
+  <h2>Amount → Words</h2>
+  <p class="section-hint">For writing out a numeric amount — the standard cheque/bank-slip format.</p>
+
+  <div class="row">
+    <label class="field">
+      <span>Amount</span>
+      <input type="number" min="0" step="any" [ngModel]="amount()" (ngModelChange)="amount.set($event)" name="amount" />
+    </label>
+    <label class="field">
+      <span>Currency</span>
+      <select [ngModel]="currency()" (ngModelChange)="currency.set($event)" name="currency">
+        @for (code of currencies; track code) {
+          <option [value]="code">{{ code }} — {{ currencyNames[code] }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  <div class="result-panel">
+    <div class="result-text">
+      <span class="result-label">Cheque / bank slip</span>
+      <p class="words-output" animate.enter="fade-in-up" animate.leave="fade-out-down">{{ words() }}</p>
+    </div>
+    <sap-button type="button" fillMode="outline" (clicked)="copyWords()">
+      {{ copied() ? 'Copied!' : 'Copy' }}
+    </sap-button>
+  </div>
+
+  <div class="result-panel">
+    <div class="result-text">
+      <span class="result-label">Plain English</span>
+      <p class="words-output" animate.enter="fade-in-up" animate.leave="fade-out-down">{{ plainWords() }}</p>
+    </div>
+    <sap-button type="button" fillMode="outline" (clicked)="copyPlainWords()">
+      {{ copiedPlain() ? 'Copied!' : 'Copy' }}
+    </sap-button>
+  </div>
+</section>
+
+<section class="converter-section">
+  <h2>Words → Amount</h2>
+  <p class="section-hint">For checking a written amount against its numeral — paste or type it below.</p>
+
+  <label class="field full-width">
+    <span>Amount in words</span>
+    <textarea
+      rows="2"
+      placeholder="e.g. One Thousand Two Hundred Thirty-Four and 56/100 US Dollars"
+      [ngModel]="wordsInput()"
+      (ngModelChange)="wordsInput.set($event)"
+      name="wordsInput"
+    ></textarea>
+  </label>
+
+  <div class="result-panel">
+    @if (parsedAmount() !== null) {
+      <p class="amount-output" animate.enter="fade-in-up" animate.leave="fade-out-down">
+        {{ parsedAmount() | number: '1.2-2' }}
+      </p>
+    } @else {
+      <p class="status hint" animate.enter="fade-in-up" animate.leave="fade-out-down">
+        Type an amount in words above.
+      </p>
+    }
+  </div>
+</section>

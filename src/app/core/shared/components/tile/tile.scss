@@ -1,0 +1,35 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1.25rem;
+  background: var(--sap-surface);
+  border: 1px solid var(--sap-border);
+  border-radius: var(--sap-radius);
+  box-shadow: var(--sap-shadow);
+}
+
+.tile-icon {
+  display: block;
+  font-size: 2.5rem;
+  line-height: 1;
+  margin-bottom: 0.75rem;
+}
+
+.tile-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--sap-text);
+}
+
+.tile-subtitle {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--sap-muted);
+}

@@ -1,0 +1,88 @@
+<div class="base-row">
+  <label class="field">
+    <span>Amount</span>
+    <input
+      type="number"
+      min="0"
+      step="any"
+      [ngModel]="amount()"
+      (ngModelChange)="amount.set($event); refresh()"
+      name="amount"
+    />
+  </label>
+
+  <label class="field">
+    <span>Base currency</span>
+    <select [ngModel]="base()" (ngModelChange)="base.set($event); refresh()" name="base">
+      @for (code of allCurrencies; track code) {
+        <option [value]="code">{{ code }} — {{ currencyNames[code] }}</option>
+      }
+    </select>
+  </label>
+</div>
+
+<div class="add-currency">
+  <input
+    type="text"
+    list="available-currencies"
+    placeholder="Search by code or name…"
+    [ngModel]="currencyToAdd()"
+    (ngModelChange)="currencyToAdd.set($event)"
+    name="currencyToAdd"
+  />
+  <datalist id="available-currencies">
+    @for (option of currencySearchOptions; track option.code) {
+      <option [value]="option.label"></option>
+    }
+  </datalist>
+  <sap-button (clicked)="addCurrency()">Add currency</sap-button>
+</div>
+
+@if (error()) {
+  <p class="status error" animate.enter="fade-in-up" animate.leave="fade-out-down">{{ error() }}</p>
+} @else if (asOfDate()) {
+  <p class="as-of" animate.enter="fade-in-up" animate.leave="fade-out-down">
+    Rates as of {{ asOfDate() }}{{ loading() ? ' · updating…' : '' }}
+  </p>
+}
+
+<ul class="currency-list">
+  @for (row of rows(); track row.code) {
+    <li
+      class="currency-row"
+      [class.drag-over]="dragOverCode() === row.code"
+      animate.enter="fade-in-up"
+      animate.leave="fade-out-down"
+      (dragover)="onDragOver($event, row.code)"
+      (drop)="onDrop($event, row.code)"
+    >
+      <span
+        class="drag-handle"
+        draggable="true"
+        aria-label="Drag to reorder"
+        title="Drag to reorder"
+        (dragstart)="onDragStart($event, row.code)"
+        (dragend)="onDragEnd()"
+      ></span>
+      <img class="currency-flag" [src]="row.flagSrc" alt="" aria-hidden="true" />
+      <div class="currency-info">
+        <span class="currency-code">{{ row.code }}</span>
+        <span class="currency-name">{{ row.name }}</span>
+      </div>
+      <div
+        class="currency-value"
+        [title]="'1 ' + base() + ' = ' + (row.rate | number: '1.4-4') + ' ' + row.code"
+      >
+        {{ row.converted | number: '1.2-2' }} <span class="currency-value-code">{{ row.code }}</span>
+      </div>
+      <div class="row-actions">
+        <sap-button
+          fillMode="flat"
+          themeColor="error"
+          ariaLabel="Remove {{ row.code }}"
+          (clicked)="removeCurrency(row.code)"
+        >🗑️</sap-button>
+      </div>
+    </li>
+  }
+</ul>

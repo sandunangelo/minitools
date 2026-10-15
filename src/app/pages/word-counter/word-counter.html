@@ -1,0 +1,47 @@
+<sap-page-header
+  icon="📝"
+  title="Word Counter"
+  description="Count words, characters, sentences, and paragraphs, with an estimated reading time."
+/>
+
+<div class="input-row">
+  <textarea
+    class="text-input"
+    rows="8"
+    placeholder="Type or paste some text…"
+    [ngModel]="text()"
+    (ngModelChange)="text.set($event)"
+    name="sourceText"
+  ></textarea>
+</div>
+
+<div class="toolbar">
+  <sap-button type="button" fillMode="outline" [disabled]="!text()" (clicked)="clear()">Clear</sap-button>
+</div>
+
+<dl class="stats-grid">
+  <div class="stat-card">
+    <dt>Words</dt>
+    <dd>{{ stats().words | number }}</dd>
+  </div>
+  <div class="stat-card">
+    <dt>Characters</dt>
+    <dd>{{ stats().charsWithSpaces | number }}</dd>
+  </div>
+  <div class="stat-card">
+    <dt>Characters (no spaces)</dt>
+    <dd>{{ stats().charsNoSpaces | number }}</dd>
+  </div>
+  <div class="stat-card">
+    <dt>Sentences</dt>
+    <dd>{{ stats().sentences | number }}</dd>
+  </div>
+  <div class="stat-card">
+    <dt>Paragraphs</dt>
+    <dd>{{ stats().paragraphs | number }}</dd>
+  </div>
+  <div class="stat-card">
+    <dt>Reading time</dt>
+    <dd>{{ stats().readingMinutes > 0 ? (stats().readingMinutes + ' min') : '—' }}</dd>
+  </div>
+</dl>

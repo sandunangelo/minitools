@@ -1,0 +1,15 @@
+<sap-page-header icon="❓" title="FAQ" description="Answers to common questions about using Minitools." />
+
+<div class="faq-list">
+  @for (item of faqs; track item.question; let i = $index) {
+    <div class="faq-item" [class.open]="isOpen(i)">
+      <button type="button" class="faq-question" (click)="toggle(i)" [attr.aria-expanded]="isOpen(i)">
+        <span>{{ item.question }}</span>
+        <span class="faq-chevron" aria-hidden="true">▾</span>
+      </button>
+      @if (isOpen(i)) {
+        <p class="faq-answer" animate.enter="fade-in-up">{{ item.answer }}</p>
+      }
+    </div>
+  }
+</div>

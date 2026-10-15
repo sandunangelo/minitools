@@ -1,0 +1,62 @@
+.category-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.tab {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--sap-border);
+  border-radius: 999px;
+  background: var(--sap-surface);
+  color: var(--sap-muted);
+  font-size: 0.9rem;
+  cursor: pointer;
+
+  &.active {
+    background: var(--sap-primary);
+    border-color: var(--sap-primary);
+    color: white;
+  }
+}
+
+.converter {
+  display: flex;
+  align-items: end;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--sap-muted);
+
+  input,
+  select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--sap-border);
+    border-radius: 6px;
+    background: var(--sap-surface);
+    color: var(--sap-text);
+    font-size: 1rem;
+    min-width: 140px;
+  }
+}
+
+.result-panel {
+  padding: 1.25rem 1.5rem;
+  background: var(--sap-surface);
+  border: 1px solid var(--sap-border);
+  border-radius: var(--sap-radius);
+  box-shadow: var(--sap-shadow);
+  min-height: 3rem;
+}
+
+.result-amount {
+  font-size: 1.4rem;
+}

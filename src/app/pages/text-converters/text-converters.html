@@ -1,0 +1,33 @@
+<sap-page-header
+  icon="🔄"
+  title="Text Converters"
+  description="Validate and format structured text — JSON and XML — with error locations, beautify/minify, and syntax highlighting."
+/>
+
+<div class="subtool-tabs">
+  <button
+    type="button"
+    class="tab"
+    [class.active]="activeSubtool() === 'json-formatter'"
+    (click)="activeSubtool.set('json-formatter')"
+  >
+    🧾 JSON Formatter
+  </button>
+  <button
+    type="button"
+    class="tab"
+    [class.active]="activeSubtool() === 'xml-formatter'"
+    (click)="activeSubtool.set('xml-formatter')"
+  >
+    🏷️ XML Formatter
+  </button>
+</div>
+
+@switch (activeSubtool()) {
+  @case ('json-formatter') {
+    <sap-json-formatter />
+  }
+  @case ('xml-formatter') {
+    <sap-xml-formatter />
+  }
+}

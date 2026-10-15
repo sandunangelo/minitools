@@ -1,0 +1,119 @@
+<sap-page-header
+  icon="🎨"
+  title="Color Converter"
+  description="Enter a color as HEX, RGB, or HSL and get the other formats."
+/>
+
+<div class="picker-row">
+  <input
+    type="color"
+    class="color-swatch"
+    [ngModel]="hexText() || '#000000'"
+    (ngModelChange)="colorInput.set($event); commitToHistory()"
+    name="colorPicker"
+  />
+  <input
+    type="text"
+    class="color-input"
+    placeholder="#3366ff, rgb(51, 102, 255), or hsl(225, 100%, 60%)"
+    [ngModel]="colorInput()"
+    (ngModelChange)="colorInput.set($event)"
+    (blur)="commitToHistory()"
+    (keydown.enter)="commitToHistory()"
+    name="colorText"
+    spellcheck="false"
+  />
+</div>
+
+
+<!-- Always reserves its line, so the error appearing/disappearing never shifts anything below
+     it — only its own text fades in and out (see color-converter.scss). -->
+<p class="status error" [class.visible]="!rgb()">
+  Enter a valid color — HEX (#3366ff), RGB (rgb(51, 102, 255)), or HSL (hsl(225, 100%, 60%)).
+</p>
+
+<!-- Simple line-art "copy" icon (two overlapping boxes) and its "copied" checkmark swap-in,
+     defined once and reused across the three buttons below via NgTemplateOutlet. -->
+<ng-template #copyIcon>
+  <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <rect x="9" y="9" width="12" height="12" rx="2" ry="2"></rect>
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+  </svg>
+</ng-template>
+<ng-template #checkIcon>
+  <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <polyline points="20 6 9 17 4 12"></polyline>
+  </svg>
+</ng-template>
+
+<!-- Stays mounted (and the same height) whether the current input is valid or not, instead of
+     swapping with the error message above — dashes + disabled Copy buttons stand in for values
+     while invalid, so nothing above or below this block jumps as you type. -->
+<dl class="format-list" [class.is-empty]="!rgb()">
+  <div class="format-row">
+    <div class="format-row-text">
+      <dt>HEX</dt>
+      <dd>{{ hexText() || '—' }}</dd>
+    </div>
+    <sap-button
+      type="button"
+      fillMode="flat"
+      themeColor="base"
+      [disabled]="!rgb()"
+      ariaLabel="{{ copied() === 'hex' ? 'Copied' : 'Copy' }} HEX value"
+      (clicked)="copy('hex', hexText())"
+    ><ng-container *ngTemplateOutlet="copied() === 'hex' ? checkIcon : copyIcon"></ng-container></sap-button>
+  </div>
+
+  <div class="format-row">
+    <div class="format-row-text">
+      <dt>RGB</dt>
+      <dd>{{ rgbText() || '—' }}</dd>
+    </div>
+    <sap-button
+      type="button"
+      fillMode="flat"
+      themeColor="base"
+      [disabled]="!rgb()"
+      ariaLabel="{{ copied() === 'rgb' ? 'Copied' : 'Copy' }} RGB value"
+      (clicked)="copy('rgb', rgbText())"
+    ><ng-container *ngTemplateOutlet="copied() === 'rgb' ? checkIcon : copyIcon"></ng-container></sap-button>
+  </div>
+
+  <div class="format-row">
+    <div class="format-row-text">
+      <dt>HSL</dt>
+      <dd>{{ hslText() || '—' }}</dd>
+    </div>
+    <sap-button
+      type="button"
+      fillMode="flat"
+      themeColor="base"
+      [disabled]="!rgb()"
+      ariaLabel="{{ copied() === 'hsl' ? 'Copied' : 'Copy' }} HSL value"
+      (clicked)="copy('hsl', hslText())"
+    ><ng-container *ngTemplateOutlet="copied() === 'hsl' ? checkIcon : copyIcon"></ng-container></sap-button>
+  </div>
+</dl>
+
+@if (history().length > 0) {
+  <section class="history-section" animate.enter="fade-in-up" animate.leave="fade-out-down">
+    <h2 class="history-title">Recent conversions</h2>
+    <ul class="history-list">
+      @for (entry of history(); track entry) {
+        <li class="history-row" animate.enter="fade-in-up" animate.leave="fade-out-down">
+          <button type="button" class="history-swatch-btn" (click)="useHistoryEntry(entry)">
+            <span class="history-swatch" [style.backgroundColor]="entry"></span>
+            <span class="history-hex">{{ entry }}</span>
+          </button>
+          <sap-button
+            fillMode="flat"
+            themeColor="error"
+            ariaLabel="Remove {{ entry }} from recent conversions"
+            (clicked)="removeHistoryEntry(entry)"
+          >🗑️</sap-button>
+        </li>
+      }
+    </ul>
+  </section>
+}

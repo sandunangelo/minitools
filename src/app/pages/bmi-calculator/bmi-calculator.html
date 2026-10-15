@@ -1,0 +1,45 @@
+<sap-page-header
+  icon="⚖️"
+  title="BMI Calculator"
+  description="Calculate Body Mass Index from height and weight."
+/>
+
+<form class="bmi-form" (submit)="$event.preventDefault()">
+  <label class="field">
+    <span>Height (cm)</span>
+    <input
+      type="number"
+      min="0"
+      step="any"
+      [ngModel]="heightCm()"
+      (ngModelChange)="heightCm.set($event)"
+      name="height"
+    />
+  </label>
+
+  <label class="field">
+    <span>Weight (kg)</span>
+    <input
+      type="number"
+      min="0"
+      step="any"
+      [ngModel]="weightKg()"
+      (ngModelChange)="weightKg.set($event)"
+      name="weight"
+    />
+  </label>
+
+  <sap-button type="button" fillMode="outline" (clicked)="reset()">Reset</sap-button>
+</form>
+
+@if (bmi() !== null) {
+  <section
+    class="result-panel"
+    [class]="category()?.className"
+    animate.enter="fade-in-up"
+    animate.leave="fade-out-down"
+  >
+    <p class="bmi-value">{{ bmi() | number: '1.1-1' }}</p>
+    <p class="bmi-category">{{ category()?.label }}</p>
+  </section>
+}

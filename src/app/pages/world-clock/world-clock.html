@@ -1,0 +1,130 @@
+<sap-page-header
+  icon="🕒"
+  title="World Clock"
+  description="See the current or planned time across your selected time zones."
+/>
+
+<div class="add-zone">
+  <input
+    type="text"
+    list="available-zones"
+    placeholder="Search for a city or time zone…"
+    [ngModel]="zoneToAdd()"
+    (ngModelChange)="zoneToAdd.set($event)"
+    name="zoneToAdd"
+  />
+  <datalist id="available-zones">
+    @for (option of zoneSearchOptions; track option.zone) {
+      <option [value]="option.label"></option>
+    }
+  </datalist>
+  <sap-button (clicked)="addZone()">Add zone</sap-button>
+</div>
+
+<div class="planner-box">
+  <div class="planner-controls">
+    <label class="field">
+      <span>Date</span>
+      <input type="date" [ngModel]="planDate()" (ngModelChange)="planDate.set($event)" name="planDate" />
+    </label>
+
+    <label class="field">
+      <span>Reference zone</span>
+      <select [ngModel]="referenceZone()" (ngModelChange)="setReferenceZone($event)" name="referenceZone">
+        @for (option of referenceZoneOptions(); track option.zone) {
+          <option [value]="option.zone">{{ option.label }}</option>
+        }
+      </select>
+    </label>
+
+    <sap-button type="button" fillMode="flat" (clicked)="resetPlanToNow()">Reset to now</sap-button>
+  </div>
+
+  <label class="slider-field">
+    <span>Time in {{ referenceZone() }}: <strong>{{ planTimeLabel() }}</strong></span>
+    <div class="slider-track-wrap">
+      <input
+        type="range"
+        min="0"
+        max="1425"
+        step="15"
+        list="plan-hour-ticks"
+        [ngModel]="planMinutes()"
+        (ngModelChange)="planMinutes.set(+$event)"
+        name="planMinutes"
+      />
+      <datalist id="plan-hour-ticks">
+        @for (tick of hourTicks; track tick) {
+          <option [value]="tick"></option>
+        }
+      </datalist>
+      @if (nowMarker(); as marker) {
+        <div class="now-marker" [style.left.%]="marker.percent" aria-hidden="true" title="Current time"></div>
+      }
+    </div>
+    <div class="slider-scale" aria-hidden="true">
+      <span>00:00</span>
+      <span>06:00</span>
+      <span>12:00</span>
+      <span>18:00</span>
+      <span>23:45</span>
+    </div>
+  </label>
+
+  <p class="planner-hint">Daylight saving is applied automatically for whichever dates it affects.</p>
+</div>
+
+<ul class="clock-list">
+  @for (row of displayRows(); track row.zone) {
+    <li
+      class="clock-row"
+      [class]="row.band"
+      [class.drag-over]="dragOverZone() === row.zone"
+      [class.is-reference]="row.isReference"
+      [style.backgroundColor]="row.shade"
+      animate.enter="fade-in-up"
+      animate.leave="fade-out-down"
+      (dragover)="onDragOver($event, row.zone)"
+      (drop)="onDrop($event, row.zone)"
+    >
+      <span
+        class="drag-handle"
+        draggable="true"
+        aria-label="Drag to reorder"
+        title="Drag to reorder"
+        (dragstart)="onDragStart($event, row.zone)"
+        (dragend)="onDragEnd()"
+      ></span>
+      <div class="clock-info">
+        <span class="zone-name">{{ row.title }}</span>
+        <span class="zone-date" [class.day-diff]="row.differentDay">{{ row.weekday }} · {{ row.subtitle }}</span>
+        @if (row.band === 'weekend') {
+          <span class="weekend-badge" animate.enter="fade-in" animate.leave="fade-out">Non-working day</span>
+        }
+      </div>
+      <span class="period">
+        <span class="period-icon" aria-hidden="true">{{ row.periodIcon }}</span>
+        <span class="period-label">{{ row.periodLabel }}</span>
+      </span>
+      <button
+        type="button"
+        class="zone-time-btn"
+        [disabled]="row.isReference"
+        (click)="selectRowAsReference(row.zone)"
+        [title]="row.isReference ? 'This zone is the current reference' : 'Set ' + row.zone + ' as the reference'"
+      >
+        <time class="zone-time">{{ row.time }}</time>
+      </button>
+      <div class="row-actions">
+        <sap-button
+          fillMode="flat"
+          themeColor="error"
+          ariaLabel="Remove {{ row.zone }}"
+          (clicked)="removeZone(row.zone)"
+        >
+          🗑️
+        </sap-button>
+      </div>
+    </li>
+  }
+</ul>

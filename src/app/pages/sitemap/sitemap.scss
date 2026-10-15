@@ -1,0 +1,134 @@
+.tree {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 760px;
+}
+
+.tree-node {
+  margin: 0;
+}
+
+.tree-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem 0.4rem;
+  border-radius: 6px;
+
+  &:hover {
+    background: var(--sap-bg);
+  }
+}
+
+.tree-toggle {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--sap-muted);
+  // Close to .tree-label's 0.95rem rather than a much smaller glyph easy to miss at a glance —
+  // same "▾" chevron character as the FAQ page's own accordion toggle, for one consistent
+  // expand/collapse icon language across the app rather than a different glyph per page.
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+  // Points right (collapsed) by default; rotates to point down once expanded — same semantic
+  // as before, just re-based around "▾" instead of "▸" so both pages share one glyph.
+  transform: rotate(-90deg);
+  transition:
+    transform 0.15s ease,
+    color 0.15s ease;
+
+  &.expanded {
+    transform: rotate(0deg);
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: var(--sap-primary);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--sap-primary) 18%, transparent);
+  }
+}
+
+.tree-toggle-spacer {
+  flex-shrink: 0;
+  width: 1.4rem;
+}
+
+.tree-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  text-decoration: none;
+  color: var(--sap-text);
+  font-weight: 600;
+  font-size: 0.95rem;
+
+  &:hover {
+    color: var(--sap-primary);
+  }
+}
+
+.tree-icon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.tree-description {
+  color: var(--sap-muted);
+  font-size: 0.85rem;
+}
+
+.tree-children {
+  list-style: none;
+  margin: 0.15rem 0 0.3rem;
+  padding: 0;
+  margin-left: 1.25rem;
+}
+
+// Classic file-explorer "├─ / └─" connectors — one solid vertical trunk segment plus one
+// horizontal elbow PER NODE, rather than a single shared line down the whole group (which is
+// what made the previous version read as too faint/unclear: a bare vertical rule with no actual
+// branch connecting it to each item). Every node's trunk runs its own full height by default,
+// which is what lets it connect down to the NEXT sibling below it; only the last child shortens
+// its trunk to stop exactly at its own elbow ("└─") instead of continuing past it ("├─").
+.tree-children > .tree-node {
+  position: relative;
+  padding-left: 1.5rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--sap-muted);
+  }
+
+  &:last-child::before {
+    bottom: 50%;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    top: 50%;
+    width: 1rem;
+    height: 2px;
+    background: var(--sap-muted);
+  }
+}

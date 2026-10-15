@@ -1,0 +1,204 @@
+<sap-page-header
+  icon="🔣"
+  title="String Encode/Decode"
+  description="Encode or decode text for URLs, Base64, HTML, JSON strings, and JWT tokens."
+/>
+
+<div class="mode-tabs">
+  @for (m of modes; track m.id) {
+    <button type="button" class="tab" [class.active]="mode() === m.id" (click)="setMode(m.id)">
+      {{ m.icon }} {{ m.label }}
+    </button>
+  }
+</div>
+
+@if (mode() !== 'jwt') {
+  <div class="codec-toolbar">
+    <div class="view-toggle">
+      <button type="button" [class.active]="direction() === 'encode'" (click)="setDirection('encode')">
+        Encode
+      </button>
+      <button type="button" [class.active]="direction() === 'decode'" (click)="setDirection('decode')">
+        Decode
+      </button>
+    </div>
+    <div class="pane-actions">
+      <sap-button type="button" fillMode="outline" (clicked)="loadCodecSample()">Load sample</sap-button>
+      <sap-button
+        type="button"
+        fillMode="outline"
+        [disabled]="!codecResult().value"
+        (clicked)="swapCodecInputOutput()"
+      >
+        ⇄ Swap
+      </sap-button>
+      <sap-button type="button" fillMode="outline" [disabled]="!codecInput()" (clicked)="clearCodecInput()">
+        Clear
+      </sap-button>
+    </div>
+  </div>
+
+  <div class="codec-grid">
+    <div class="codec-pane">
+      <span class="pane-label">Input</span>
+      <textarea
+        class="codec-textarea"
+        spellcheck="false"
+        [placeholder]="direction() === 'encode' ? 'Type or paste plain text…' : 'Paste encoded text…'"
+        [ngModel]="codecInput()"
+        (ngModelChange)="codecInput.set($event)"
+        name="codecInput"
+      ></textarea>
+    </div>
+    <div class="codec-pane">
+      <div class="pane-header">
+        <span class="pane-label">Output</span>
+        @if (codecResult().value) {
+          <sap-button type="button" fillMode="flat" themeColor="base" (clicked)="copyCodecOutput()">
+            {{ codecCopied() ? 'Copied!' : 'Copy' }}
+          </sap-button>
+        }
+      </div>
+      @if (!codecInput()) {
+        <p class="status hint">Type or paste text on the left to {{ direction() }} it.</p>
+      } @else if (codecResult().error; as error) {
+        <p class="status error">⚠️ {{ error }}</p>
+      } @else {
+        <textarea class="codec-textarea" readonly [ngModel]="codecResult().value" name="codecOutput"></textarea>
+      }
+    </div>
+  </div>
+} @else {
+  <section class="converter-section">
+    <div class="section-header">
+      <h2>Decode JWT</h2>
+      <sap-button type="button" fillMode="outline" (clicked)="loadJwtSample()">Load sample</sap-button>
+    </div>
+    <textarea
+      class="jwt-token-input"
+      spellcheck="false"
+      placeholder="Paste a JWT (header.payload.signature)…"
+      [ngModel]="jwtToken()"
+      (ngModelChange)="jwtToken.set($event)"
+      name="jwtToken"
+    ></textarea>
+
+    @if (!jwtResult()) {
+      <p class="status hint">Paste a JWT above to decode its header and payload.</p>
+    } @else if (jwtResult()!.error; as error) {
+      <p class="status error">⚠️ {{ error }}</p>
+    } @else if (jwtResult()!.decoded; as decoded) {
+      <label class="field full-width">
+        Secret (optional — verifies an HS256 signature)
+        <input
+          type="text"
+          [ngModel]="jwtSecret()"
+          (ngModelChange)="jwtSecret.set($event)"
+          placeholder="your-256-bit-secret"
+          name="jwtSecret"
+        />
+      </label>
+
+      @switch (jwtSignatureStatus()) {
+        @case ('valid') {
+          <p class="status valid">✅ Signature verified with this secret.</p>
+        }
+        @case ('invalid') {
+          <p class="status error">⚠️ Signature does NOT match this secret.</p>
+        }
+        @case ('unsupported-alg') {
+          <p class="status hint">Verification only supports HS256 — this token uses "{{ decoded.alg }}".</p>
+        }
+        @case ('checking') {
+          <p class="status hint">Checking signature…</p>
+        }
+      }
+
+      @if (decoded.claims.iat || decoded.claims.exp || decoded.claims.nbf) {
+        <div class="jwt-claims">
+          @if (decoded.claims.iat) {
+            <span><strong>Issued:</strong> {{ decoded.claims.iat }}</span>
+          }
+          @if (decoded.claims.nbf) {
+            <span><strong>Not before:</strong> {{ decoded.claims.nbf }}</span>
+          }
+          @if (decoded.claims.exp) {
+            <span><strong>Expires:</strong> {{ decoded.claims.exp }}</span>
+          }
+        </div>
+      }
+
+      <div class="jwt-parts-grid">
+        <div class="jwt-part">
+          <div class="pane-header">
+            <span class="pane-label">Header</span>
+            <sap-button type="button" fillMode="flat" themeColor="base" (clicked)="copyHeader()">
+              {{ copiedHeader() ? 'Copied!' : 'Copy' }}
+            </sap-button>
+          </div>
+          <pre class="jwt-json">{{ decoded.headerJson }}</pre>
+        </div>
+        <div class="jwt-part">
+          <div class="pane-header">
+            <span class="pane-label">Payload</span>
+            <sap-button type="button" fillMode="flat" themeColor="base" (clicked)="copyPayload()">
+              {{ copiedPayload() ? 'Copied!' : 'Copy' }}
+            </sap-button>
+          </div>
+          <pre class="jwt-json">{{ decoded.payloadJson }}</pre>
+        </div>
+      </div>
+    }
+  </section>
+
+  <section class="converter-section">
+    <h2>Encode JWT</h2>
+    <div class="jwt-parts-grid">
+      <div class="jwt-part">
+        <span class="pane-label">Header (JSON)</span>
+        <textarea
+          class="jwt-build-input"
+          spellcheck="false"
+          [ngModel]="jwtHeaderInput()"
+          (ngModelChange)="jwtHeaderInput.set($event)"
+          name="jwtHeaderInput"
+        ></textarea>
+      </div>
+      <div class="jwt-part">
+        <span class="pane-label">Payload (JSON)</span>
+        <textarea
+          class="jwt-build-input"
+          spellcheck="false"
+          [ngModel]="jwtPayloadInput()"
+          (ngModelChange)="jwtPayloadInput.set($event)"
+          name="jwtPayloadInput"
+        ></textarea>
+      </div>
+    </div>
+    <label class="field full-width">
+      Secret (for HS256 — leave blank for an unsigned "none" token)
+      <input
+        type="text"
+        [ngModel]="jwtEncodeSecret()"
+        (ngModelChange)="jwtEncodeSecret.set($event)"
+        name="jwtEncodeSecret"
+      />
+    </label>
+    <sap-button type="button" fillMode="solid" themeColor="primary" (clicked)="encodeJwt()">
+      Generate JWT
+    </sap-button>
+
+    @if (jwtEncodeError()) {
+      <p class="status error">⚠️ {{ jwtEncodeError() }}</p>
+    }
+    @if (jwtEncodedToken()) {
+      <div class="pane-header">
+        <span class="pane-label">Token</span>
+        <sap-button type="button" fillMode="flat" themeColor="base" (clicked)="copyEncodedJwt()">
+          {{ jwtEncodeCopied() ? 'Copied!' : 'Copy' }}
+        </sap-button>
+      </div>
+      <pre class="jwt-json jwt-token-output">{{ jwtEncodedToken() }}</pre>
+    }
+  </section>
+}

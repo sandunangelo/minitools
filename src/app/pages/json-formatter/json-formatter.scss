@@ -1,0 +1,221 @@
+.editor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  align-items: start;
+
+  // Below this, two side-by-side JSON panes get too narrow to be useful — stack them instead.
+  @media (max-width: 800px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.editor-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.pane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.25rem;
+}
+
+.pane-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--sap-muted);
+  text-transform: uppercase;
+}
+
+.pane-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 0.3rem;
+  padding: 0.2rem;
+  background: var(--sap-bg);
+  border-radius: 999px;
+
+  button {
+    padding: 0.3rem 0.75rem;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--sap-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
+
+    &.active {
+      background: var(--sap-surface);
+      color: var(--sap-text);
+      box-shadow: var(--sap-shadow);
+    }
+  }
+}
+
+// Wraps the line-number gutter + textarea as one unit — a plain <textarea> has no native
+// line-number support, so the gutter is a separate element whose scroll position is kept in
+// sync with the textarea's own via (scroll) in the template (see syncGutterScroll()).
+//
+// Fixed height (not just min-height), like a real editor's viewport, rather than growing to
+// fit all content: with the gutter as a flex sibling, letting the row size itself from content
+// means the gutter's own height (driven by however many line-number <span>s it has) stretches
+// the textarea right along with it via the flex default `align-items: stretch` — so nothing
+// would ever actually need to scroll internally, and a long paste would just make the whole
+// page enormously tall instead of scrolling in place.
+.code-editor {
+  display: flex;
+  height: 420px;
+  border: 1px solid var(--sap-border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--sap-surface);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:focus-within {
+    border-color: var(--sap-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--sap-primary) 18%, transparent);
+  }
+}
+
+.line-numbers {
+  flex-shrink: 0;
+  padding: 0.75rem 0.6rem;
+  background: var(--sap-bg);
+  border-right: 1px solid var(--sap-border);
+  color: var(--sap-muted);
+  font-family: 'Cascadia Code', Consolas, monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  text-align: right;
+  // Scrolled programmatically (synced to the textarea) only — never directly by the user.
+  overflow: hidden;
+  user-select: none;
+
+  span {
+    display: block;
+  }
+}
+
+// Holds the syntax-highlight backdrop and the (visually text-invisible) textarea stacked on
+// top of each other — the standard technique for a "highlighted textarea", since a <textarea>
+// itself can only ever render a single flat text color for its whole content, never per-token
+// colors. Both children share identical padding/font/line-height so the highlighted text behind
+// lines up exactly with where the real (invisible) text and caret sit in front.
+.code-area {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.syntax-backdrop {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  overflow: hidden;
+  pointer-events: none;
+  background: transparent;
+  color: var(--sap-text);
+  font-family: 'Cascadia Code', Consolas, monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  white-space: pre;
+
+  code {
+    font: inherit;
+  }
+}
+
+.json-textarea {
+  position: absolute;
+  inset: 0;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: transparent;
+  // The textarea still holds the real text (for editing/selection/a11y) — its own glyphs are
+  // just invisible, letting the colored backdrop underneath show through as what's "seen".
+  // caret-color keeps the cursor itself visible despite that.
+  color: transparent;
+  caret-color: var(--sap-text);
+  font-family: 'Cascadia Code', Consolas, monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  // Keeps each logical line on exactly one visual row (no soft-wrap) so it always lines up
+  // with the one line number the gutter gives it — long lines scroll horizontally instead.
+  white-space: pre;
+  overflow: auto;
+  // No manual resize handle — like a real editor's fixed viewport, dragging the textarea
+  // taller would desync it from the gutter, which can't grow to match a user-set inline height.
+  resize: none;
+
+  // A text selection still needs to be visible even though the glyphs themselves aren't.
+  &::selection {
+    background: color-mix(in srgb, var(--sap-primary) 35%, transparent);
+  }
+
+  &:focus-visible {
+    outline: none;
+    // The wrapping .code-editor's :focus-within ring (above) covers this instead, so the ring
+    // reads as one unit around the gutter + textarea together rather than just the textarea.
+    box-shadow: none;
+  }
+}
+
+// The .tok-* token color classes live in src/styles.scss (global), not here — they're applied
+// to spans injected at runtime via [innerHTML] (see highlightJson() in json-formatter.ts),
+// which never receive Angular's view-encapsulation scoping attribute since they bypass the
+// template compiler entirely. A component-scoped rule here would silently never match them.
+
+.status {
+  &.error {
+    color: #c0392b;
+    font-weight: 600;
+  }
+
+  &.valid {
+    color: #16a34a;
+    font-weight: 600;
+  }
+
+  &.hint {
+    color: var(--sap-muted);
+  }
+}
+
+.error-panel {
+  padding: 1rem 1.1rem;
+  background: color-mix(in srgb, #c0392b 6%, var(--sap-surface));
+  border: 1px solid color-mix(in srgb, #c0392b 25%, var(--sap-border));
+  border-radius: var(--sap-radius);
+}
+
+.error-snippet {
+  margin: 0.75rem 0 0;
+  padding: 0.75rem 1rem;
+  background: var(--sap-surface);
+  border: 1px solid var(--sap-border);
+  border-radius: 6px;
+  overflow-x: auto;
+  font-family: 'Cascadia Code', Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #c0392b;
+  white-space: pre;
+}

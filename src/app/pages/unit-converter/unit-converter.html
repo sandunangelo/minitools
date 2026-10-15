@@ -1,0 +1,54 @@
+<sap-page-header
+  icon="📐"
+  title="Unit Converter"
+  description="Convert between length, weight, temperature, area, volume, pressure, speed, time, and data storage units."
+/>
+
+<div class="category-tabs">
+  @for (cat of categories; track cat.id) {
+    <button
+      type="button"
+      class="tab"
+      [class.active]="cat.id === categoryId()"
+      (click)="onCategoryChange(cat.id)"
+    >
+      {{ cat.label }}
+    </button>
+  }
+</div>
+
+<form class="converter" (submit)="$event.preventDefault()">
+  <label class="field">
+    <span>Value</span>
+    <input type="number" step="any" [ngModel]="value()" (ngModelChange)="value.set($event)" name="value" />
+  </label>
+
+  <label class="field">
+    <span>From</span>
+    <select [ngModel]="fromUnitId()" (ngModelChange)="fromUnitId.set($event)" name="fromUnit">
+      @for (unit of category().units; track unit.id) {
+        <option [value]="unit.id">{{ unit.label }}</option>
+      }
+    </select>
+  </label>
+
+  <sap-button type="button" fillMode="flat" (clicked)="swap()">⇄ Swap</sap-button>
+
+  <label class="field">
+    <span>To</span>
+    <select [ngModel]="toUnitId()" (ngModelChange)="toUnitId.set($event)" name="toUnit">
+      @for (unit of category().units; track unit.id) {
+        <option [value]="unit.id">{{ unit.label }}</option>
+      }
+    </select>
+  </label>
+</form>
+
+<section class="result-panel">
+  @if (result() !== null) {
+    <p class="result-amount" animate.enter="fade-in-up" animate.leave="fade-out-down">
+      {{ value() }} {{ fromUnit()?.label }} =
+      <strong>{{ result() | number: '1.0-4' }} {{ toUnit()?.label }}</strong>
+    </p>
+  }
+</section>

@@ -1,0 +1,47 @@
+<sap-page-header
+  icon="🔤"
+  title="Text Case Converter"
+  description="Convert text between UPPERCASE, Title Case, camelCase, snake_case, and more."
+/>
+
+<div class="input-row">
+  <textarea
+    class="text-input"
+    rows="3"
+    placeholder="Type or paste some text…"
+    [ngModel]="text()"
+    (ngModelChange)="text.set($event)"
+    name="sourceText"
+  ></textarea>
+  <sap-button type="button" fillMode="outline" [disabled]="!text()" (clicked)="clear()">Clear</sap-button>
+</div>
+
+<ul class="format-list" [class.is-empty]="!text()">
+  @for (format of results(); track format.id) {
+    <li class="format-row">
+      <div class="format-row-text">
+        <span class="format-label">{{ format.label }}</span>
+        <span class="format-value">{{ format.value || '—' }}</span>
+      </div>
+      <sap-button
+        type="button"
+        fillMode="flat"
+        themeColor="base"
+        [disabled]="!format.value"
+        ariaLabel="{{ copied() === format.id ? 'Copied' : 'Copy' }} {{ format.label }} result"
+        (clicked)="copy(format.id, format.value)"
+      >
+        @if (copied() === format.id) {
+          <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        } @else {
+          <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="12" height="12" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+        }
+      </sap-button>
+    </li>
+  }
+</ul>

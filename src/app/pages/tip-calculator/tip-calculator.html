@@ -1,0 +1,56 @@
+<sap-page-header
+  icon="💰"
+  title="Tip Calculator"
+  description="Work out the tip and split the bill evenly between everyone at the table."
+/>
+
+<form class="calculator" (submit)="$event.preventDefault()">
+  <label class="field">
+    <span>Bill amount</span>
+    <input type="number" min="0" step="any" [ngModel]="bill()" (ngModelChange)="bill.set($event)" name="bill" />
+  </label>
+
+  <label class="field">
+    <span>Tip percent</span>
+    <input type="number" min="0" step="any" [ngModel]="tipPercent()" (ngModelChange)="tipPercent.set($event)" name="tipPercent" />
+  </label>
+
+  <label class="field">
+    <span>Number of people</span>
+    <input type="number" min="1" step="1" [ngModel]="people()" (ngModelChange)="people.set($event)" name="people" />
+  </label>
+</form>
+
+<div class="quick-tips">
+  @for (percent of quickTipPercents; track percent) {
+    <button
+      type="button"
+      class="quick-tip"
+      [class.active]="tipPercent() === percent"
+      (click)="tipPercent.set(percent)"
+    >
+      {{ percent }}%
+    </button>
+  }
+</div>
+
+<dl class="result-grid">
+  <div class="result-card">
+    <dt>Tip amount</dt>
+    <dd>{{ tipAmount() | number: '1.2-2' }}</dd>
+  </div>
+  <div class="result-card">
+    <dt>Total bill</dt>
+    <dd>{{ total() | number: '1.2-2' }}</dd>
+  </div>
+  <div class="result-card highlight">
+    <dt>Each person pays</dt>
+    <dd>{{ perPersonTotal() | number: '1.2-2' }}</dd>
+  </div>
+  <div class="result-card">
+    <dt>Tip per person</dt>
+    <dd>{{ perPersonTip() | number: '1.2-2' }}</dd>
+  </div>
+</dl>
+
+<sap-button type="button" fillMode="outline" (clicked)="reset()">Reset</sap-button>

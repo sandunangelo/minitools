@@ -1,0 +1,111 @@
+<sap-page-header
+  icon="🌀"
+  title="Loading Indicator Generator"
+  description="Pick a design, color, and size, then copy the ready-to-use HTML/CSS."
+/>
+
+<div class="generator-layout">
+  <div class="design-grid">
+    @for (d of designs; track d.id) {
+      <button type="button" class="design-card" [class.active]="selectedId() === d.id" (click)="selectDesign(d.id)">
+        <span class="design-thumb" [innerHTML]="thumbHtml(d)"></span>
+        <span class="design-label">{{ d.label }}</span>
+      </button>
+    }
+  </div>
+
+  <div class="preview-column">
+    <div class="controls-row">
+      <label class="control">
+        <span class="control-label">Color</span>
+        <input type="color" [ngModel]="color()" (ngModelChange)="color.set($event)" name="color" />
+      </label>
+      <label class="control">
+        <span class="control-label">Size: {{ size() }}px</span>
+        <input type="range" min="24" max="160" [ngModel]="size()" (ngModelChange)="size.set($event)" name="size" />
+      </label>
+      <div class="control">
+        <span class="control-label">Preview background</span>
+        <div class="view-toggle">
+          <button type="button" [class.active]="!previewDark()" (click)="setPreviewDark(false)">Light</button>
+          <button type="button" [class.active]="previewDark()" (click)="setPreviewDark(true)">Dark</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview-stage" [class.dark]="previewDark()">
+      <div class="preview-shape" [innerHTML]="editedHtml()"></div>
+    </div>
+  </div>
+</div>
+
+<div class="codec-toolbar">
+  <span class="pane-label">Generated Code</span>
+  <sap-button type="button" fillMode="outline" (clicked)="reset()">↺ Reset</sap-button>
+</div>
+
+<div class="codec-grid">
+  <div class="codec-pane">
+    <div class="pane-header">
+      <span class="pane-label">HTML</span>
+      <div class="pane-actions">
+        <sap-button type="button" fillMode="outline" (clicked)="beautifyHtmlBox()">Beautify</sap-button>
+        <sap-button type="button" fillMode="outline" (clicked)="minifyHtmlBox()">Minify</sap-button>
+        <sap-button type="button" fillMode="flat" themeColor="base" (clicked)="copyHtml()">
+          {{ copiedHtml() ? 'Copied!' : 'Copy' }}
+        </sap-button>
+      </div>
+    </div>
+    <div class="code-editor">
+      <div class="line-numbers" #htmlGutter>
+        @for (n of htmlLineNumbers(); track n) {
+          <span>{{ n }}</span>
+        }
+      </div>
+      <div class="code-area">
+        <pre class="syntax-backdrop" aria-hidden="true" #htmlBackdrop><code [innerHTML]="htmlHighlighted()"></code></pre>
+        <textarea
+          class="code-textarea"
+          wrap="off"
+          spellcheck="false"
+          [ngModel]="editedHtml()"
+          (ngModelChange)="editedHtml.set($event)"
+          (scroll)="syncScroll($event, htmlGutter, htmlBackdrop)"
+          name="editedHtml"
+        ></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="codec-pane">
+    <div class="pane-header">
+      <span class="pane-label">CSS</span>
+      <div class="pane-actions">
+        <sap-button type="button" fillMode="outline" (clicked)="beautifyCssBox()">Beautify</sap-button>
+        <sap-button type="button" fillMode="outline" (clicked)="minifyCssBox()">Minify</sap-button>
+        <sap-button type="button" fillMode="flat" themeColor="base" (clicked)="copyCss()">
+          {{ copiedCss() ? 'Copied!' : 'Copy' }}
+        </sap-button>
+      </div>
+    </div>
+    <div class="code-editor">
+      <div class="line-numbers" #cssGutter>
+        @for (n of cssLineNumbers(); track n) {
+          <span>{{ n }}</span>
+        }
+      </div>
+      <div class="code-area">
+        <pre class="syntax-backdrop" aria-hidden="true" #cssBackdrop><code [innerHTML]="cssHighlighted()"></code></pre>
+        <textarea
+          class="code-textarea"
+          wrap="off"
+          spellcheck="false"
+          [ngModel]="editedCss()"
+          (ngModelChange)="editedCss.set($event)"
+          (scroll)="syncScroll($event, cssGutter, cssBackdrop)"
+          name="editedCss"
+        ></textarea>
+      </div>
+    </div>
+  </div>
+</div>

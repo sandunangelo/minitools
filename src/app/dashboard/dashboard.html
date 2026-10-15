@@ -1,0 +1,122 @@
+<section class="dashboard">
+  <header class="dashboard-header">
+    <h1>Minitools</h1>
+    <p>A collection of small, everyday utilities.</p>
+  </header>
+
+  <section class="widgets-section">
+    <h2 class="section-title">My Widgets</h2>
+    @if (widgets.ids().length === 0) {
+      <p class="widgets-empty">
+        No widgets yet — click a tile below to pin a miniature, fully-working version of that
+        tool right here on your dashboard.
+      </p>
+    } @else {
+      <div class="widget-grid">
+        @for (id of widgets.ids(); track id) {
+          @if (toolFor(id); as tool) {
+            <div
+              class="widget-card"
+              [class.drag-over]="widgetDragOverId() === id"
+              animate.enter="fade-in-up"
+              animate.leave="fade-out-down"
+              (dragover)="onWidgetDragOver($event, id)"
+              (drop)="onWidgetDrop($event, id)"
+            >
+              <div class="widget-header">
+                <span
+                  class="widget-drag-handle"
+                  draggable="true"
+                  role="button"
+                  tabindex="0"
+                  aria-label="Drag to reorder"
+                  title="Drag to reorder"
+                  (dragstart)="onWidgetDragStart($event, id)"
+                  (dragend)="onWidgetDragEnd()"
+                >⠿</span>
+                <span class="widget-icon" aria-hidden="true">{{ tool.icon }}</span>
+                <span class="widget-title">{{ tool.title }}</span>
+                <a
+                  class="widget-open-link"
+                  [routerLink]="tool.route"
+                  title="Open full {{ tool.title }} page"
+                  [attr.aria-label]="'Open full ' + tool.title + ' page'"
+                >↗</a>
+                <button
+                  type="button"
+                  class="widget-remove"
+                  (click)="widgets.remove(id)"
+                  [attr.aria-label]="'Remove ' + tool.title + ' widget'"
+                  title="Remove widget"
+                >✕</button>
+              </div>
+              <div class="widget-body">
+                @if (componentFor(id); as cmp) {
+                  <ng-container *ngComponentOutlet="cmp" />
+                } @else {
+                  <p class="widget-loading">Loading…</p>
+                }
+              </div>
+            </div>
+          }
+        }
+      </div>
+    }
+  </section>
+
+  <div class="search-row">
+    <div class="search-field">
+      <span class="search-icon" aria-hidden="true">🔍</span>
+      <input
+        type="search"
+        class="search-input"
+        placeholder="Search tools…"
+        [ngModel]="searchText()"
+        (ngModelChange)="searchText.set($event)"
+        name="toolSearch"
+        aria-label="Search tools"
+      />
+    </div>
+    @if (isSearching()) {
+      <span
+        class="sentiment-badge"
+        [class]="'sentiment-' + searchSentiment().label.toLowerCase()"
+        animate.enter="fade-in"
+      >
+        {{ searchSentiment().emoji }} {{ searchSentiment().label }}
+      </span>
+    }
+  </div>
+
+  <div class="tile-grid">
+    @for (tool of filteredTools(); track tool.id) {
+      <div
+        class="tile-wrapper"
+        [class.drag-over]="dragOverToolId() === tool.id"
+        animate.enter="fade-in-up"
+        (dragover)="onDragOver($event, tool.id)"
+        (drop)="onDrop($event, tool.id)"
+      >
+        <a
+          class="tile-link"
+          [routerLink]="tool.route"
+          [draggable]="!isSearching()"
+          (dragstart)="onDragStart($event, tool.id)"
+          (dragend)="onDragEnd()"
+        >
+          <sap-tile [tool]="tool" />
+        </a>
+        <button
+          type="button"
+          class="widget-star"
+          [class.active]="widgets.isWidget(tool.id)"
+          [attr.aria-label]="(widgets.isWidget(tool.id) ? 'Remove ' : 'Add ') + tool.title + (widgets.isWidget(tool.id) ? ' widget' : ' as a dashboard widget')"
+          [attr.title]="widgets.isWidget(tool.id) ? 'Remove ' + tool.title + ' from dashboard widgets' : 'Add ' + tool.title + ' as a dashboard widget'"
+          (click)="toggleWidget($event, tool.id)"
+        >⭐</button>
+      </div>
+    } @empty {
+      <p class="no-results">No tools match "{{ searchText() }}".</p>
+    }
+  </div>
+</section>

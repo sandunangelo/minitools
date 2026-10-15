@@ -1,0 +1,338 @@
+.add-zone {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+
+  input {
+    flex: 1;
+    max-width: 320px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--sap-border);
+    border-radius: 6px;
+    background: var(--sap-surface);
+    color: var(--sap-text);
+    font-size: 0.95rem;
+  }
+}
+
+.planner-box {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--sap-surface);
+  border: 1px solid var(--sap-border);
+  border-radius: var(--sap-radius);
+  box-shadow: var(--sap-shadow);
+}
+
+.planner-controls {
+  display: flex;
+  align-items: end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--sap-muted);
+
+  input,
+  select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--sap-border);
+    border-radius: 6px;
+    background: var(--sap-surface);
+    color: var(--sap-text);
+    font-size: 0.95rem;
+    min-width: 160px;
+  }
+}
+
+.slider-field {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--sap-muted);
+
+  strong {
+    color: var(--sap-text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  input[type='range'] {
+    display: block;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+}
+
+.slider-track-wrap {
+  position: relative;
+}
+
+.now-marker {
+  position: absolute;
+  top: calc(0.5rem - 15px);
+  bottom: -9px;
+  width: 3px;
+  background: #f59e0b;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px white;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 5;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 7px solid #f59e0b;
+    transform: translateX(-50%);
+  }
+}
+
+.slider-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--sap-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.planner-hint {
+  color: var(--sap-muted);
+  font-size: 0.85rem;
+}
+
+.clock-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.clock-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1.1rem;
+  background-color: var(--sap-surface);
+  border: 1px solid var(--sap-border);
+  border-left: 6px solid var(--sap-muted);
+  border-radius: var(--sap-radius);
+  box-shadow: var(--sap-shadow);
+  // Covers both the hover/band-change states below AND the per-row time-of-day shade (set as
+  // an inline style, since it's a continuously-computed value, not a fixed set of classes) -
+  // a slower, easing transition so that shade visibly glides as the slider moves.
+  transition: background-color 0.4s ease;
+
+  &.working {
+    border-left-color: #22c55e;
+  }
+
+  &.edge {
+    border-left-color: #f59e0b;
+  }
+
+  &.night {
+    border-left-color: #ef4444;
+  }
+
+  &.weekend {
+    border-left-color: #9333ea;
+  }
+
+  // An inline style sets this row's time-of-day background-color, which would otherwise
+  // silently win over a background-color set here (inline beats a class selector) - so this
+  // state uses an outline instead, which layers independently of background-color.
+  &.drag-over {
+    outline: 2px solid var(--sap-primary);
+    outline-offset: -2px;
+  }
+
+  &.is-reference {
+    border-right: 4px solid var(--sap-primary);
+  }
+}
+
+.drag-handle {
+  position: relative;
+  width: 10px;
+  height: 16px;
+  flex-shrink: 0;
+  cursor: grab;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--sap-muted);
+    box-shadow:
+      6px 0 0 var(--sap-muted),
+      0 6px 0 var(--sap-muted),
+      6px 6px 0 var(--sap-muted),
+      0 12px 0 var(--sap-muted),
+      6px 12px 0 var(--sap-muted);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.clock-info {
+  flex: 1;
+  // Without this, a flex item won't shrink below its content's unwrapped width — and the
+  // row title is now a full "GMT±H:MM City, Country" label, long enough to push the row
+  // wider instead of wrapping on tighter viewports.
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.zone-name {
+  font-weight: 600;
+}
+
+.zone-date {
+  font-size: 0.85rem;
+  color: var(--sap-muted);
+  transition: color 0.15s ease;
+
+  // Calls out that this zone's local date isn't the same as the reference date/zone's —
+  // easy to miss otherwise, and exactly the kind of mismatch that causes scheduling mistakes.
+  &.day-diff {
+    color: #b45309;
+    font-weight: 700;
+  }
+}
+
+.weekend-badge {
+  display: inline-block;
+  align-self: start;
+  margin-top: 0.3rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: #9333ea;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.zone-time {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  min-width: 9ch;
+  text-align: right;
+}
+
+.zone-time-btn {
+  padding: 0.25rem 0.4rem;
+  margin: -0.25rem -0.4rem;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+
+  &:hover:not(:disabled),
+  &:focus-visible {
+    background: color-mix(in srgb, var(--sap-primary) 10%, transparent);
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+
+  .zone-time {
+    color: inherit;
+  }
+}
+
+.period {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.4rem;
+  min-width: 7rem;
+  font-size: 0.85rem;
+  color: var(--sap-muted);
+}
+
+.period-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+@media (max-width: 640px) {
+  .add-zone {
+    flex-wrap: wrap;
+
+    select {
+      max-width: none;
+    }
+  }
+
+  .planner-controls .field select,
+  .planner-controls .field input {
+    min-width: 0;
+  }
+
+  .clock-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      'handle info remove'
+      'handle period time';
+    column-gap: 0.75rem;
+    row-gap: 0.45rem;
+  }
+
+  .drag-handle {
+    grid-area: handle;
+    align-self: center;
+  }
+
+  .clock-info {
+    grid-area: info;
+    min-width: 0;
+  }
+
+  .row-actions {
+    grid-area: remove;
+    justify-self: end;
+  }
+
+  .period {
+    grid-area: period;
+    justify-self: start;
+    min-width: 0;
+  }
+
+  .zone-time-btn {
+    grid-area: time;
+    justify-self: end;
+    min-width: 0;
+
+    .zone-time {
+      font-size: 1.2rem;
+    }
+  }
+}

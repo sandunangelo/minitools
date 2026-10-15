@@ -1,0 +1,305 @@
+// Note: none of the spinner's own visual rules (shape, color, animation) live here — those are
+// generated dynamically per design/color/size and injected via reactive <style> blocks in the
+// template (see loading-indicator.ts). This file only styles the generator UI's own chrome.
+
+// Side-by-side with the preview column on medium/large screens, stacked below it on small
+// ones — same 800px breakpoint as the HTML/CSS boxes' .codec-grid below, for consistency.
+.generator-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  align-items: start;
+  margin-bottom: 1.5rem;
+
+  @media (max-width: 800px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Capped to ~3 rows (scrolling the rest inside the grid itself, not the whole page) now that
+// the collection has grown to ~100 cards — otherwise picking a design means scrolling past a
+// very tall grid before ever reaching the controls/preview. Measured directly off a real
+// rendered .design-card rather than guessed; row height doesn't depend on column width, so this
+// holds regardless of which screen size puts the grid in a narrower (2-column) layout.
+.design-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 0.75rem;
+  max-height: 335px;
+  overflow-y: auto;
+}
+
+.preview-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+.design-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 1rem 0.5rem;
+  border: 1px solid var(--sap-border);
+  border-radius: var(--sap-radius);
+  background: var(--sap-surface);
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:hover {
+    border-color: var(--sap-primary);
+  }
+
+  &.active {
+    border-color: var(--sap-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--sap-primary) 18%, transparent);
+  }
+}
+
+.design-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+}
+
+.design-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--sap-text);
+  text-align: center;
+}
+
+.controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1.5rem;
+  padding: 1rem 1.25rem;
+  background: var(--sap-surface);
+  border: 1px solid var(--sap-border);
+  border-radius: var(--sap-radius);
+}
+
+.control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.control-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--sap-muted);
+}
+
+input[type='color'] {
+  width: 3rem;
+  height: 2.25rem;
+  padding: 0.2rem;
+  border: 1px solid var(--sap-border);
+  border-radius: 6px;
+  background: var(--sap-surface);
+  cursor: pointer;
+}
+
+input[type='range'] {
+  width: 180px;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 0.3rem;
+  padding: 0.2rem;
+  background: var(--sap-bg);
+  border-radius: 999px;
+
+  button {
+    padding: 0.3rem 0.75rem;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--sap-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease;
+
+    &.active {
+      background: var(--sap-surface);
+      color: var(--sap-text);
+      box-shadow: var(--sap-shadow);
+    }
+  }
+}
+
+.preview-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 220px;
+  background: var(--sap-bg);
+  border: 1px solid var(--sap-border);
+  border-radius: var(--sap-radius);
+  transition: background-color 0.15s ease;
+
+  &.dark {
+    background: #1f2430;
+    border-color: #1f2430;
+  }
+}
+
+.preview-shape {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.codec-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.codec-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+
+  @media (max-width: 800px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.codec-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.pane-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.25rem;
+}
+
+.pane-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--sap-muted);
+  text-transform: uppercase;
+}
+
+.pane-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+// Editable, syntax-highlighted output boxes — the exact same technique as JSON/XML Formatter's
+// editor panes (necessarily: a plain <textarea> can only ever render one flat text color for
+// its whole content, so per-token color on something you can STILL type into needs the same
+// highlighted-backdrop-behind-an-invisible-text-textarea stack). Fixed height, same flex-
+// stretch-defeats-internal-scrolling reasoning already documented on those two formatters: a
+// line-number gutter sized purely by its own content would otherwise stretch this row to match
+// via flexbox's default `align-items: stretch`, and nothing would ever need to scroll.
+.code-editor {
+  display: flex;
+  height: 260px;
+  border: 1px solid var(--sap-border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--sap-surface);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:focus-within {
+    border-color: var(--sap-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--sap-primary) 18%, transparent);
+  }
+}
+
+.line-numbers {
+  flex-shrink: 0;
+  padding: 0.75rem 0.6rem;
+  background: var(--sap-bg);
+  border-right: 1px solid var(--sap-border);
+  color: var(--sap-muted);
+  font-family: 'Cascadia Code', Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  text-align: right;
+  // Scrolled programmatically (synced to the textarea) only — never directly by the user.
+  overflow: hidden;
+  user-select: none;
+
+  span {
+    display: block;
+  }
+}
+
+.code-area {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.syntax-backdrop {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  overflow: hidden;
+  pointer-events: none;
+  background: transparent;
+  color: var(--sap-text);
+  font-family: 'Cascadia Code', Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  white-space: pre;
+
+  code {
+    font: inherit;
+  }
+}
+
+.code-textarea {
+  position: absolute;
+  inset: 0;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--sap-text);
+  font-family: 'Cascadia Code', Consolas, monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  white-space: pre;
+  overflow: auto;
+  resize: none;
+
+  &::selection {
+    background: color-mix(in srgb, var(--sap-primary) 35%, transparent);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+// The .css-* token color classes live in src/styles.scss (global), not here — same
+// [innerHTML]-encapsulation reason as every other syntax-highlighted backdrop in this app.

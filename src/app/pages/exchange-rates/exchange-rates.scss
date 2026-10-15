@@ -1,0 +1,152 @@
+.base-row {
+  display: flex;
+  align-items: end;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--sap-muted);
+
+  input,
+  select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--sap-border);
+    border-radius: 6px;
+    background: var(--sap-surface);
+    color: var(--sap-text);
+    font-size: 1rem;
+    min-width: 140px;
+  }
+}
+
+.add-currency {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+
+  input {
+    flex: 1;
+    max-width: 320px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--sap-border);
+    border-radius: 6px;
+    background: var(--sap-surface);
+    color: var(--sap-text);
+    font-size: 0.95rem;
+  }
+}
+
+.as-of {
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  color: var(--sap-muted);
+}
+
+.status {
+  color: var(--sap-muted);
+}
+
+.status.error {
+  color: #c0392b;
+}
+
+.currency-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.currency-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1.1rem;
+  background: var(--sap-surface);
+  border: 1px solid var(--sap-border);
+  border-radius: var(--sap-radius);
+  box-shadow: var(--sap-shadow);
+  transition: outline-color 0.15s ease;
+
+  &.drag-over {
+    outline: 2px solid var(--sap-primary);
+    outline-offset: -2px;
+  }
+}
+
+.drag-handle {
+  position: relative;
+  width: 10px;
+  height: 16px;
+  flex-shrink: 0;
+  cursor: grab;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--sap-muted);
+    box-shadow:
+      6px 0 0 var(--sap-muted),
+      0 6px 0 var(--sap-muted),
+      6px 6px 0 var(--sap-muted),
+      0 12px 0 var(--sap-muted),
+      6px 12px 0 var(--sap-muted);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.currency-flag {
+  width: 2rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.08);
+}
+
+.currency-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.currency-code {
+  font-weight: 600;
+}
+
+.currency-name {
+  font-size: 0.85rem;
+  color: var(--sap-muted);
+}
+
+.currency-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.currency-value-code {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--sap-muted);
+}

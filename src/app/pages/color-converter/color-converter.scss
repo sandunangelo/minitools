@@ -1,0 +1,175 @@
+.picker-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.color-swatch {
+  width: 3.5rem;
+  height: 3.5rem;
+  padding: 0;
+  border: 1px solid var(--sap-border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.color-input {
+  flex: 1;
+  max-width: 340px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--sap-border);
+  border-radius: 6px;
+  background: var(--sap-surface);
+  color: var(--sap-text);
+  font-family: 'Cascadia Code', Consolas, monospace;
+  font-size: 1rem;
+}
+
+.format-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin: 0;
+  // Only the content fades — the list itself stays mounted at the same height regardless of
+  // whether the current input is valid, so nothing around it jumps.
+  transition: opacity 0.15s ease;
+
+  &.is-empty {
+    opacity: 0.55;
+  }
+
+  // One column per row runs out of room fast on narrow screens — three side by side there would
+  // force in-column wrapping/truncation instead, so stack back to one column per row.
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.format-row {
+  display: flex;
+  // Centers the copy button against the FULL card height (label + value together), not just
+  // against its own small header line — the button is a direct flex child of this row, not
+  // nested inside the text block, specifically so this centers it correctly.
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.9rem 1rem;
+  background: var(--sap-surface);
+  border: 1px solid var(--sap-border);
+  border-radius: var(--sap-radius);
+  box-shadow: var(--sap-shadow);
+}
+
+.format-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+
+  dt {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--sap-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-family: 'Cascadia Code', Consolas, monospace;
+    font-size: 1rem;
+    overflow-wrap: break-word;
+  }
+}
+
+.copy-icon {
+  // `display: block` (rather than relying on `vertical-align`, which flex items ignore
+  // entirely) removes the SVG's inline-baseline metrics from the equation — without it, the
+  // button's own `align-items: center` still left a few px of vertical offset.
+  display: block;
+  width: 1.35rem;
+  height: 1.35rem;
+  // No explicit color here — the SVG's stroke="currentColor" picks up sap-button's own
+  // text color for themeColor="base" (var(--sap-muted)) through normal inheritance.
+}
+
+.status.error {
+  // Reserves its line unconditionally (min-height, not display:none) so the message
+  // appearing/disappearing never shifts the format list below it — only its own text fades.
+  min-height: 1.3em;
+  margin-bottom: 1rem;
+  color: #c0392b;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+
+  &.visible {
+    opacity: 1;
+  }
+}
+
+.history-section {
+  margin-top: 2rem;
+}
+
+.history-title {
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--sap-muted);
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.8rem;
+  background: var(--sap-surface);
+  border: 1px solid var(--sap-border);
+  border-radius: var(--sap-radius);
+  box-shadow: var(--sap-shadow);
+}
+
+.history-swatch-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.25rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: var(--sap-bg);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--sap-primary) 18%, transparent);
+  }
+}
+
+.history-swatch {
+  width: 1.75rem;
+  height: 1.75rem;
+  flex-shrink: 0;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.1);
+}
+
+.history-hex {
+  font-family: 'Cascadia Code', Consolas, monospace;
+  font-size: 0.95rem;
+  color: var(--sap-text);
+}

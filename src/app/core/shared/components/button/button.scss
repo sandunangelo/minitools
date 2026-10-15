@@ -1,0 +1,80 @@
+:host {
+  display: contents;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    filter 0.15s ease,
+    transform 0.1s ease;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--btn-color) 30%, transparent);
+  }
+}
+
+// Theme color just sets one custom property; each fillMode below decides how to use it
+// (background vs. border vs. text), so the two can combine freely.
+.btn--primary {
+  --btn-color: var(--sap-primary);
+}
+
+.btn--base {
+  --btn-color: var(--sap-muted);
+}
+
+.btn--error {
+  --btn-color: #ef4444;
+}
+
+.btn--solid {
+  background: var(--btn-color);
+  border-color: var(--btn-color);
+  color: white;
+
+  &:hover:not(:disabled) {
+    filter: brightness(0.92);
+  }
+}
+
+.btn--outline {
+  background: transparent;
+  border-color: var(--btn-color);
+  color: var(--btn-color);
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--btn-color) 10%, transparent);
+  }
+}
+
+.btn--flat {
+  background: transparent;
+  color: var(--btn-color);
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--btn-color) 10%, transparent);
+  }
+}

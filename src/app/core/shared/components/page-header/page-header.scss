@@ -1,0 +1,24 @@
+:host {
+  display: block;
+  margin-bottom: 1.5rem;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.icon {
+  font-size: 1.75rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.description {
+  margin-top: 0.35rem;
+  color: var(--sap-muted);
+}

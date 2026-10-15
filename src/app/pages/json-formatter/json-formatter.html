@@ -1,0 +1,91 @@
+<div class="editor-grid">
+  <div class="editor-pane">
+    <div class="pane-header">
+      <span class="pane-label">Input</span>
+      <div class="pane-actions">
+        <sap-button type="button" fillMode="outline" (clicked)="loadSample()">Load sample</sap-button>
+        <sap-button type="button" fillMode="outline" [disabled]="!canFormatInput()" (clicked)="beautifyInput()">
+          Beautify
+        </sap-button>
+        <sap-button type="button" fillMode="outline" [disabled]="!canFormatInput()" (clicked)="minifyInput()">
+          Minify
+        </sap-button>
+        <sap-button type="button" fillMode="outline" [disabled]="!input()" (clicked)="clear()">Clear</sap-button>
+      </div>
+    </div>
+    <div class="code-editor">
+      <div class="line-numbers" #inputGutter>
+        @for (n of inputLineNumbers(); track n) {
+          <span>{{ n }}</span>
+        }
+      </div>
+      <div class="code-area">
+        <pre class="syntax-backdrop" aria-hidden="true" #inputBackdrop><code [innerHTML]="inputHighlightHtml()"></code></pre>
+        <textarea
+          class="json-textarea"
+          wrap="off"
+          placeholder="Paste JSON here…"
+          spellcheck="false"
+          [ngModel]="input()"
+          (ngModelChange)="input.set($event)"
+          (scroll)="syncScroll($event, inputGutter, inputBackdrop)"
+          name="jsonInput"
+        ></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="editor-pane">
+    <div class="pane-header">
+      @if (result(); as result) {
+        @if (!result.error) {
+          <div class="view-toggle">
+            <button type="button" [class.active]="viewMode() === 'beautify'" (click)="setViewMode('beautify')">
+              Beautify
+            </button>
+            <button type="button" [class.active]="viewMode() === 'minify'" (click)="setViewMode('minify')">
+              Minify
+            </button>
+          </div>
+          <sap-button type="button" fillMode="flat" themeColor="base" (clicked)="copyOutput()">
+            {{ copied() ? 'Copied!' : 'Copy' }}
+          </sap-button>
+        } @else {
+          <span class="pane-label">Output</span>
+        }
+      } @else {
+        <span class="pane-label">Output</span>
+      }
+    </div>
+
+    @if (!result()) {
+      <p class="status hint">Paste or type JSON on the left to validate and format it.</p>
+    } @else if (result()!.error; as error) {
+      <div class="error-panel" animate.enter="fade-in-up" animate.leave="fade-out-down">
+        <p class="status error">⚠️ {{ error.message }}</p>
+        @if (error.snippet) {
+          <pre class="error-snippet"><code>{{ error.snippet }}</code></pre>
+        }
+      </div>
+    } @else {
+      <div class="code-editor" animate.enter="fade-in-up" animate.leave="fade-out-down">
+        <div class="line-numbers" #outputGutter>
+          @for (n of outputLineNumbers(); track n) {
+            <span>{{ n }}</span>
+          }
+        </div>
+        <div class="code-area">
+          <pre class="syntax-backdrop" aria-hidden="true" #outputBackdrop><code [innerHTML]="outputHighlightHtml()"></code></pre>
+          <textarea
+            class="json-textarea"
+            wrap="off"
+            readonly
+            [ngModel]="output()"
+            name="jsonOutput"
+            (scroll)="syncScroll($event, outputGutter, outputBackdrop)"
+          ></textarea>
+        </div>
+      </div>
+    }
+  </div>
+</div>
