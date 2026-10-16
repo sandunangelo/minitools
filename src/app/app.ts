@@ -2,6 +2,7 @@ import { Component, ElementRef, computed, inject, signal, viewChild } from '@ang
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
+import { AdUnit } from './core/shared/components/ad-unit/ad-unit';
 import { Tool, TOOLS } from './core/shared/models/tool';
 import { ToolOrderService } from './core/shared/services/tool-order.service';
 
@@ -18,7 +19,7 @@ function formatBytes(bytes: number): string {
 }
 
 @Component({
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, AdUnit],
   selector: 'sap-root',
   styleUrl: './app.scss',
   templateUrl: './app.html',
